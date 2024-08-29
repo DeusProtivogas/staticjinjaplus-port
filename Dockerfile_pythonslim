@@ -1,0 +1,29 @@
+FROM python:3.9-slim
+
+RUN apt-get update && \
+	apt-get install -y curl tar git && \
+	rm -rf /var/lib/apt/lists/*
+
+ARG VERSION=0.1.0
+
+RUN if [ "$VERSION" = "latest" ]; then \
+        git clone --depth 1 --branch main https://github.com/MrDave/StaticJinjaPlus.git /app; \
+    elif [ "$VERSION" = "develop" ]; then \
+        git clone --branch main https://github.com/MrDave/StaticJinjaPlus.git /app; \
+    else \
+        curl -L https://github.com/MrDave/StaticJinjaPlus/archive/${VERSION}.tar.gz -o app.tar.gz \
+        && mkdir -p /app \
+        && tar -xzf app.tar.gz --strip-components=1 -C /app \
+        && rm app.tar.gz; \
+    fi
+
+RUN pip install -r /app/requirements.txt
+
+RUN mkdir -p /app/build /app/templates
+
+RUN cp -r /app/templates_example/* /app/templates/
+
+
+WORKDIR /app
+
+CMD ["sh", "-c", "echo 'Log start.' && python main.py -w"]
