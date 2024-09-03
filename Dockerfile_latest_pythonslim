@@ -1,13 +1,13 @@
 FROM python:3.10-slim
 
 RUN apt-get update && \
-	apt-get install -y curl tar git && \
-	rm -rf /var/lib/apt/lists/*
-
-ARG VERSION=0.1.0
+    apt-get install -y curl tar && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-ADD https://github.com/MrDave/StaticJinjaPlus/archive/${VERSION}.tar.gz /tmp/app.tar.gz
+
+ADD https://github.com/MrDave/StaticJinjaPlus/archive/main.tar.gz /tmp/app.tar.gz
+
 RUN tar xzf /tmp/app.tar.gz --strip-components=1 -C /app && rm /tmp/app.tar.gz
 
 RUN pip install -r /app/requirements.txt
@@ -15,8 +15,5 @@ RUN pip install -r /app/requirements.txt
 RUN mkdir -p /app/build /app/templates
 
 RUN cp -r /app/templates_example/* /app/templates/
-
-
-WORKDIR /app
 
 CMD ["sh", "-c", "echo 'Log start.' && python main.py -w"]
